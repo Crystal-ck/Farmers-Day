@@ -2,5 +2,6 @@
 #define BEDROOM_H
 
 void drawBedroom();
+void updateBedroom(float elapsedSeconds);
 
 #endif

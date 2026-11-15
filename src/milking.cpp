@@ -2,7 +2,10 @@
 #include <GL/freeglut.h>
 #include "milking.h"
 #include "environment_utils.h"
+#include "../characters/cow.h"
+#include "../characters/farmer.h"
 
+#include <cmath>
 namespace
 {
     void milkBox(float x, float y, float z,
@@ -291,7 +294,8 @@ namespace
     }
 }
 
-void drawMilkingArea()
+
+void drawMilkingArea(float elapsedSeconds)
 {
     drawShedStructure();
     drawStall();
@@ -299,4 +303,27 @@ void drawMilkingArea()
     drawMilkingEquipment();
     drawHooksAndRopes();
     drawShedDetails();
+
+    // Cow stays visible throughout both activities
+    drawCow(-3.0f, -2.0f, 1.0f, 1.5f, elapsedSeconds);
+
+    // FIRST HALF: WASHING THE COW
+    if (elapsedSeconds < 9.0f)
+    {
+        float washMotion = 35.0f * std::sin(elapsedSeconds * 5.0f);
+
+        // Farmer moves his arm as he washes the cow
+        drawFarmer(0.8f, -2.0f, 2.0f,
+                   1.0f, 3.0f, 0.0f, washMotion);
+    }
+    // SECOND HALF: MILKING THE COW
+    else
+    {
+        float milkMotion = 18.0f +
+                           12.0f * std::sin(elapsedSeconds * 8.0f);
+
+        // Farmer performs repeated milking movements
+        drawFarmer(0.8f, -2.0f, 2.0f,
+                   1.0f, 5.0f, 0.0f, milkMotion);
+    }
 }

@@ -2,6 +2,9 @@
 #include <GL/freeglut.h>
 #include <string>
 #include "shop.h"
+#include "../characters/farmer.h"
+#include "../characters/shopkeeper.h"
+#include <cmath>
 
 namespace
 {
@@ -418,7 +421,8 @@ namespace
     }
 }
 
-void drawVillageShop()
+
+void drawVillageShop(float elapsedSeconds)
 {
     drawShopGround();
     drawShopBuilding();
@@ -427,4 +431,20 @@ void drawVillageShop()
     drawShopCounter();
     drawMilkProducts();
     drawShopDetails();
+
+    // Shopkeeper stands behind the counter
+    float wave = 20.0f * std::sin(elapsedSeconds * 3.0f);
+
+    drawShopkeeperPosed(
+        -2.0f, 0.1f, -0.5f,
+        0.8f, elapsedSeconds, wave
+    );
+
+    // Farmer stands in front of the counter
+    float armMotion = 10.0f * std::sin(elapsedSeconds * 3.0f);
+
+    drawFarmer(
+        2.0f, 0.1f, 5.5f,
+        0.8f, 0.0f, 0.0f, armMotion
+    );
 }
