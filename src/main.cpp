@@ -31,9 +31,10 @@ namespace
             updateSunrise(elapsedSeconds);
         }
         else if (elapsedSeconds < SCENE_DURATION * 2.0f)
-        {
-            glClearColor(0.65f, 0.70f, 0.75f, 1.0f);
-        }
+{
+    updateBedroom(elapsedSeconds - SCENE_DURATION);
+    glClearColor(0.65f, 0.70f, 0.75f, 1.0f);
+}
         else if (elapsedSeconds < SCENE_DURATION * 3.0f)
         {
             glClearColor(0.55f, 0.70f, 0.82f, 1.0f);
@@ -88,7 +89,7 @@ namespace
         }
         else if (elapsedSeconds < SCENE_DURATION * 4.0f)
         {
-            drawMilkingArea();
+            drawMilkingArea(elapsedSeconds - SCENE_DURATION * 3.0f);
         }
         else if (elapsedSeconds < SCENE_DURATION * 5.0f)
         {
@@ -103,7 +104,7 @@ namespace
         }
         else if (elapsedSeconds < SCENE_DURATION * 7.0f)
         {
-            drawVillageShop();
+          drawVillageShop(elapsedSeconds - SCENE_DURATION * 6.0f);
         }
         else if (elapsedSeconds < SCENE_DURATION * 8.0f)
         {

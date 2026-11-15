@@ -241,7 +241,7 @@ namespace
     // ------------------------------------------------------------------
     // Neck, cape and head (all of it pecks together).
     // ------------------------------------------------------------------
-    void drawNeckAndHead()
+    void drawNeckAndHead(float crow)
     {
         // neck
         drawSphereRot(0.25f, 0.86f, 0.0f, 0.20f, 0.15f, 0.13f, 0, 0, 72, COL(HACKLE_COL));
@@ -276,8 +276,16 @@ namespace
 
         // beak
         drawCylinder(0.41f, 0.995f, 0.0f, 0.042f, 0.006f, 0.130f, 0, 90, -8, COL(BEAK_COL));
-        drawCylinder(0.41f, 0.965f, 0.0f, 0.030f, 0.006f, 0.100f, 0, 90, -4, COL(BEAK_COL));
+        // Lower beak opens during the crowing action
+glPushMatrix();
 
+glTranslatef(0.41f, 0.965f, 0.0f);
+glRotatef(-28.0f * crow, 0.0f, 0.0f, 1.0f);
+glTranslatef(-0.41f, -0.965f, 0.0f);
+
+drawCylinder(0.41f, 0.965f, 0.0f, 0.030f, 0.006f, 0.100f, 0, 90, -4, COL(BEAK_COL));
+
+glPopMatrix();
         // serrated comb: base ridge plus five points
         drawSphereRot(0.325f, 1.085f, 0.0f, 0.095f, 0.030f, 0.018f, 0, 0, -5, COL(COMB_COL));
         const float cx[5] = {0.255f, 0.290f, 0.325f, 0.360f, 0.395f};
@@ -314,14 +322,21 @@ void drawRooster(float x, float y, float z, float scale, float time)
     // ---------------- Neck + head (pecks around the base of the neck) ----------------
     {
         float peck = powf(fmaxf(0.0f, sinf(time * 2.4f)), 8.0f);
-        float angle = -45.0f * peck + 2.0f * sinf(time * 1.1f);
+
+// Repeating crowing movement
+float crow = powf(fmaxf(0.0f, sinf(time * 1.8f)), 10.0f);
+
+// Raise the head while crowing
+float angle = -45.0f * peck
+              + 18.0f * crow
+              + 2.0f * sinf(time * 1.1f);
 
         glPushMatrix();
         glTranslatef(0.18f, 0.60f, 0.0f);
         glRotatef(angle, 0, 0, 1);
         glTranslatef(-0.18f, -0.60f, 0.0f);
 
-        drawNeckAndHead();
+        drawNeckAndHead(crow);
 
         glPopMatrix();
     }

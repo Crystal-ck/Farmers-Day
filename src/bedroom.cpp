@@ -1,6 +1,43 @@
 
 #include <GL/freeglut.h>
 #include <cmath>
+#include "../characters/farmer.h"
+
+namespace
+{
+    float bedroomTime = 0.0f;
+}
+
+void updateBedroom(float elapsedSeconds)
+{
+    bedroomTime = elapsedSeconds;
+}
+
+
+void drawBedroomFarmer()
+{
+    auto smoothStep = [](float t)
+    {
+        t = fmaxf(0.0f, fminf(1.0f, t));
+        return t * t * (3.0f - 2.0f * t);
+    };
+
+    float sitProgress = smoothStep((bedroomTime - 5.0f) / 5.0f);
+    float legProgress = smoothStep((bedroomTime - 10.0f) / 4.0f);
+
+    float hipAngle = 90.0f * sitProgress;
+    float legAngle = 90.0f * legProgress;
+
+    glPushMatrix();
+
+    glTranslatef(2.2f, -0.38f, -1.55f);
+    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+
+    drawFarmer(0.0f, 0.0f, 0.0f,
+               0.85f, hipAngle, legAngle);
+
+    glPopMatrix();
+}
 
 // --------------------------------------------------
 // BEDROOM ENVIRONMENT
@@ -487,6 +524,7 @@ void drawBedroom()
     drawBedroomRug();
     drawBedroomChair();
     drawBedroomDecor();
+    drawBedroomFarmer();
 
     glPopMatrix();
 }

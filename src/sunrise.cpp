@@ -3,12 +3,15 @@
 #include <algorithm>
 #include <cmath>
 
+
+#include "../characters/rooster.h"
 #include "sunrise.h"
 #include "environment_utils.h"
 
 namespace
 {
     float sunHeight = 1.0f;
+    float sunriseElapsed = 0.0f;
 
     float smoothTransition(float a, float b, float t)
     {
@@ -446,6 +449,8 @@ namespace
 // UPDATE SUNRISE ANIMATION
 void updateSunrise(float elapsedSeconds)
 {
+    sunriseElapsed = elapsedSeconds;
+
     sunHeight = 1.0f +
         std::min(elapsedSeconds / 18.0f, 1.0f) * 4.0f;
 
@@ -470,4 +475,6 @@ void drawSunrise()
     drawTree(12.0f, -8.0f, 1.3f);
 
     drawHouse();
+    // Rooster crowing during sunrise
+drawRooster(-8.0f, -1.98f, 3.0f, 1.0f, sunriseElapsed);
 }
