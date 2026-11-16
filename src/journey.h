@@ -6,3 +6,4 @@ void updateJourney(float elapsedSeconds, bool returningHome);
 void drawJourney(float elapsedSeconds, bool returningHome);
 
 #endif
+

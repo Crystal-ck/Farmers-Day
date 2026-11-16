@@ -2,48 +2,46 @@
 #include <GL/freeglut.h>
 #include <cmath>
 #include "../characters/farmer.h"
+#include <algorithm>
+#include "shared_sun.h"
 
 namespace
 {
     float bedroomTime = 0.0f;
 }
 
-void updateBedroom(float elapsedSeconds)
+void updateBedroom(float deltaTime)
 {
-    bedroomTime = elapsedSeconds;
+    bedroomTime += deltaTime;
 }
+
 
 
 void drawBedroomFarmer()
 {
-    auto smoothStep = [](float t)
-    {
-        t = fmaxf(0.0f, fminf(1.0f, t));
-        return t * t * (3.0f - 2.0f * t);
-    };
-
-    float sitProgress = smoothStep((bedroomTime - 5.0f) / 5.0f);
-    float legProgress = smoothStep((bedroomTime - 10.0f) / 4.0f);
-
-    float hipAngle = 90.0f * sitProgress;
-    float legAngle = 90.0f * legProgress;
+    float armMovement = 3.0f * sinf(bedroomTime * 1.5f);
 
     glPushMatrix();
 
-    glTranslatef(2.2f, -0.38f, -1.55f);
-    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+    // Move him to the front edge of the bed
+   glTranslatef(2.2f, -1.10f, 0.85f);
 
-    drawFarmer(0.0f, 0.0f, 0.0f,
-               0.85f, hipAngle, legAngle);
+    glScalef(0.85f, 0.85f, 0.85f);
+
+    // Sitting upright, with legs hanging over the edge
+    drawFarmerPosed(
+        0.0f, 0.0f, 0.0f,
+        1.0f,
+        0.0f,
+        -90.0f,
+        -90.0f,
+        8.0f + armMovement,
+        8.0f - armMovement,
+        bedroomTime
+    );
 
     glPopMatrix();
 }
-
-// --------------------------------------------------
-// BEDROOM ENVIRONMENT
-// Open-front farmhouse bedroom
-// --------------------------------------------------
-
 void bedroomBox(float x, float y, float z,
                 float sx, float sy, float sz,
                 float r, float g, float b)
@@ -162,10 +160,19 @@ void drawBedroomWindow()
                3.5f, 2.6f, 0.12f,
                0.30f, 0.17f, 0.08f);
 
-    // Window glass
-    bedroomBox(-3.0f, 1.8f, -5.08f,
-               3.15f, 2.25f, 0.06f,
-               0.45f, 0.72f, 0.83f);
+    // Morning sky outside the window
+bedroomBox(-3.0f, 1.8f, -5.08f,
+           3.15f, 2.25f, 0.06f,
+           0.55f, 0.72f, 0.91f);
+
+// Same shared sun used in Scene 1
+float sunY = 1.4f +
+             std::min(bedroomTime / 8.0f, 1.0f) * 0.7f;
+
+drawSharedSun(-4.0f, sunY, -4.98f, 0.35f);
+bedroomSphere(-4.0f, sunY, -5.0f,
+              0.38f, 0.38f, 0.08f,
+              1.0f, 0.72f, 0.25f);
 
     // Window frame
     bedroomBox(-3.0f, 3.0f, -4.99f,
@@ -514,6 +521,9 @@ void drawBedroomDecor()
 void drawBedroom()
 {
     glPushMatrix();
+
+    // Scale the bedroom to fit inside the Sunrise farmhouse
+    glScalef(0.32f, 0.32f, 0.32f);
 
     drawBedroomRoom();
     drawBedroomWindow();

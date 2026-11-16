@@ -2,6 +2,7 @@
 #include <GL/freeglut.h>
 #include <algorithm>
 #include <cmath>
+#include "shared_sun.h"
 
 
 #include "../characters/rooster.h"
@@ -44,16 +45,9 @@ namespace
 
     // SUN
     void drawSun()
-    {
-        drawEllipsoid(-6.0f, sunHeight, -9.0f,
-                      1.1f, 1.1f, 1.1f,
-                      1.0f, 0.78f, 0.28f);
-
-        drawEllipsoid(-6.0f, sunHeight, -8.9f,
-                      0.85f, 0.85f, 0.85f,
-                      1.0f, 0.88f, 0.48f);
-    }
-
+{
+    drawSharedSun(-6.0f, sunHeight, -9.0f, 1.0f);
+}
     // CLOUDS
     void drawCloud(float x, float y, float z, float scale)
     {
@@ -131,8 +125,8 @@ namespace
         glPopMatrix();
 
         drawCylinder(0.0f, 1.8f, 0.0f,
-                     -0.55f, 2.7f, 0.0f,
-                     0.08f, 0.30f, 0.16f, 0.07f);
+             -0.55f, 2.7f, 0.0f,
+             0.08f, 0.30f, 0.16f, 0.07f);
 
         drawCylinder(0.0f, 1.8f, 0.0f,
                      0.55f, 2.7f, 0.0f,
@@ -447,34 +441,39 @@ namespace
 }
 
 // UPDATE SUNRISE ANIMATION
-void updateSunrise(float elapsedSeconds)
+void updateSunrise(float deltaTime)
 {
-    sunriseElapsed = elapsedSeconds;
+    // Accumulate elapsed time instead of repeatedly resetting it
+    sunriseElapsed += deltaTime;
 
-    sunHeight = 1.0f +
-        std::min(elapsedSeconds / 18.0f, 1.0f) * 4.0f;
+    // Complete the sunrise within the 8-second scene
+    float progress = std::min(sunriseElapsed / 8.0f, 1.0f);
 
-    updateSky(elapsedSeconds);
+    // Move the sun from below the horizon into the sky
+    sunHeight = smoothTransition(-1.2f, 5.5f, progress);
+
+    // Gradually change the sky from night to morning
+    updateSky(sunriseElapsed);
 }
-
 // DRAW COMPLETE SUNRISE ENVIRONMENT
 void drawSunrise()
 {
     drawGround();
-
     drawHills();
 
     drawCloud(-7.0f, 5.0f, -10.0f, 1.0f);
     drawCloud(2.0f, 6.0f, -11.0f, 1.2f);
     drawCloud(9.0f, 4.5f, -10.0f, 0.8f);
 
+    // Shared sunrise model
     drawSun();
 
     drawTree(-10.0f, -4.0f, 1.2f);
     drawTree(9.0f, -5.0f, 1.0f);
     drawTree(12.0f, -8.0f, 1.3f);
 
-    drawHouse();
-    // Rooster crowing during sunrise
-drawRooster(-8.0f, -1.98f, 3.0f, 1.0f, sunriseElapsed);
+    // No farmhouse in Scene 1
+
+    // Rooster crowing
+    drawRooster(-8.0f, -1.98f, 3.0f, 1.0f, sunriseElapsed);
 }

@@ -1,8 +1,8 @@
 
 #include <GL/freeglut.h>
 #include <cmath>
-
-#include "../include/journey.h"
+#include <GL/glu.h>
+#include "journey.h"
 #include "../characters/farmer.h"
 
 namespace
@@ -326,35 +326,72 @@ namespace
     // FARMER TRAVELLING ON THE ROAD
     // --------------------------------------------------
 
-    void drawJourneyFarmer(float elapsedSeconds, bool returningHome)
-    {
-        float walking = std::sin(elapsedSeconds * 7.0f);
+    
+void drawJourneyFarmer(float elapsedSeconds, bool returningHome)
+{
+    float walking = sinf(elapsedSeconds * 7.0f);
 
-        float bob = 0.045f * std::fabs(walking);
-        float legMovement = 25.0f * walking;
-        float armMovement = 20.0f * walking;
-        float bodySway = 3.0f * walking;
+    float bob = 0.045f * fabsf(walking);
+    float legMovement = 22.0f * walking;
 
-        glPushMatrix();
+    float armLeft = 35.0f;
+    float armRight = 10.0f;
 
-        glTranslatef(0.0f, bob, 8.0f);
+    glPushMatrix();
 
-        if (!returningHome)
-        {
-            glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
-        }
+    glTranslatef(0.0f, bob, 8.0f);
 
-        glRotatef(bodySway, 0.0f, 1.0f, 0.0f);
+    // Face the direction of travel.
+    if (!returningHome)
+        glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
 
-        drawFarmer(
-            0.0f, 0.0f, 0.0f,
-            0.8f, 0.0f, legMovement, armMovement
-        );
+    drawFarmerPosed(
+        0.0f, 0.0f, 0.0f,
+        0.8f,
+        0.0f,
+        legMovement,
+        -legMovement,
+        armLeft,
+        armRight,
+        elapsedSeconds
+    );
 
-        glPopMatrix();
-    }
+    // Milk bottle carried in the farmer's left hand.
+    // It follows the same translation, rotation and scale.
+    glPushMatrix();
 
-} // End of anonymous namespace
+    glTranslatef(-0.38f, 0.65f, 0.15f);
+    glScalef(0.8f, 0.8f, 0.8f);
+
+    glColor3f(0.82f, 0.90f, 0.92f);
+
+    GLUquadric* bottle = gluNewQuadric();
+
+    glPushMatrix();
+    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+
+    gluCylinder(bottle, 0.16f, 0.16f, 0.48f, 20, 4);
+
+    glTranslatef(0.0f, 0.0f, 0.48f);
+    gluCylinder(bottle, 0.08f, 0.08f, 0.16f, 20, 3);
+
+    glPopMatrix();
+
+    gluDeleteQuadric(bottle);
+
+    // Bottle cap
+    glPushMatrix();
+    glTranslatef(0.0f, 0.65f, 0.0f);
+    glColor3f(0.85f, 0.82f, 0.70f);
+    glutSolidCube(0.13f);
+    glPopMatrix();
+
+    glPopMatrix();
+
+    glPopMatrix();
+}
+}
+// End of anonymous namespace
 
 // ==================================================
 // UPDATE JOURNEY

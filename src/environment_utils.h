@@ -1,6 +1,8 @@
 #ifndef ENVIRONMENT_UTILS_H
 #define ENVIRONMENT_UTILS_H
 
+void drawSharedSun(float x, float y, float z, float scale);
+
 void drawEllipsoid(float x, float y, float z,
                    float sx, float sy, float sz,
                    float r, float g, float b);

@@ -386,22 +386,25 @@ void drawPitchfork() {
 
 } // namespace
 
-void drawFarmObjects() {
+
+void drawFarmObjects()
+{
     float time = glutGet(GLUT_ELAPSED_TIME) * 0.001f;
 
-    // Save only what we touch so the caller's state is untouched.
-    glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT | GL_CURRENT_BIT);
+    glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT |
+                 GL_LINE_BIT | GL_CURRENT_BIT);
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_LINE_SMOOTH);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
-    drawFence();       // back
+    drawFence();
     drawTrough();
     drawHayStack();
     drawRake();
     drawWaterBarrel(time);
-    drawPitchfork();   // front
+    drawPitchfork();
 
     glPopAttrib();
 }

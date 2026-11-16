@@ -1,3 +1,5 @@
+#include <GL/freeglut.h>
+#include <GL/glu.h>
 #include "rooster.h"
 #include "primitives.h"
 #include <math.h>

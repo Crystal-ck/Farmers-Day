@@ -4,6 +4,7 @@
 #include "environment_utils.h"
 #include "../characters/cow.h"
 #include "../characters/farmer.h"
+#include "../Objects/MilkingObjects.h"
 
 #include <cmath>
 namespace
@@ -300,30 +301,62 @@ void drawMilkingArea(float elapsedSeconds)
     drawShedStructure();
     drawStall();
     drawFeedingArea();
-    drawMilkingEquipment();
+    drawMilkingObjects(elapsedSeconds);
     drawHooksAndRopes();
     drawShedDetails();
 
-    // Cow stays visible throughout both activities
+  
+    // --------------------------------------------------
+    // COW
+    // --------------------------------------------------
+
     drawCow(-3.0f, -2.0f, 1.0f, 1.5f, elapsedSeconds);
 
-    // FIRST HALF: WASHING THE COW
+    // --------------------------------------------------
+    // FARMER: WASHING THEN MILKING
+    // --------------------------------------------------
+
+    glPushMatrix();
+
+    // Position farmer beside the cow
+    glTranslatef(-2.0f, -1.95f, 1.8f);
+
+    // Turn farmer towards the cow
+    glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+
     if (elapsedSeconds < 9.0f)
     {
-        float washMotion = 35.0f * std::sin(elapsedSeconds * 5.0f);
+        // WASHING PHASE
+        float washMotion = 25.0f * sin(elapsedSeconds * 5.0f);
 
-        // Farmer moves his arm as he washes the cow
-        drawFarmer(0.8f, -2.0f, 2.0f,
-                   1.0f, 3.0f, 0.0f, washMotion);
+        drawFarmerPosed(
+            0, 0, 0,
+            1.0f,
+            12.0f,
+            -90.0f, -90.0f,
+            35.0f + washMotion,
+            35.0f - washMotion,
+            elapsedSeconds
+        );
     }
-    // SECOND HALF: MILKING THE COW
     else
     {
-        float milkMotion = 18.0f +
-                           12.0f * std::sin(elapsedSeconds * 8.0f);
+        // MILKING PHASE
+        float squeeze = 12.0f * sin(elapsedSeconds * 10.0f);
 
-        // Farmer performs repeated milking movements
-        drawFarmer(0.8f, -2.0f, 2.0f,
-                   1.0f, 5.0f, 0.0f, milkMotion);
+        float leftArm = 45.0f + squeeze;
+        float rightArm = 45.0f - squeeze;
+
+        drawFarmerPosed(
+            0, 0, 0,
+            1.0f,
+            5.0f,
+            -90.0f, -90.0f,
+            leftArm,
+            rightArm,
+            elapsedSeconds
+        );
     }
+
+    glPopMatrix();
 }

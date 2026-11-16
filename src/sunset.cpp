@@ -2,7 +2,7 @@
 #include <GL/freeglut.h>
 #include <cmath>
 #include "sunset.h"
-
+#include <GL/glu.h>
 namespace
 {
     constexpr float PI = 3.14159265f;

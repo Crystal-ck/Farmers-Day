@@ -1,4 +1,6 @@
 #include "cow.h"
+#include <GL/freeglut.h>
+#include <GL/glu.h>
 #include "primitives.h"
 #include <math.h>
 

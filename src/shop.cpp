@@ -422,6 +422,7 @@ namespace
 }
 
 
+
 void drawVillageShop(float elapsedSeconds)
 {
     drawShopGround();
@@ -432,19 +433,52 @@ void drawVillageShop(float elapsedSeconds)
     drawMilkProducts();
     drawShopDetails();
 
-    // Shopkeeper stands behind the counter
-    float wave = 20.0f * std::sin(elapsedSeconds * 3.0f);
+    // --------------------------------------------------
+    // SHOPKEEPER: STANDS BEHIND THE COUNTER
+    // --------------------------------------------------
+
+    // Small greeting movement during the first few seconds
+    float wave = 0.0f;
+
+    if (elapsedSeconds < 4.0f)
+    {
+        wave = 0.5f + 0.5f * std::sin(elapsedSeconds * 3.0f);
+    }
 
     drawShopkeeperPosed(
         -2.0f, 0.1f, -0.5f,
         0.8f, elapsedSeconds, wave
     );
 
-    // Farmer stands in front of the counter
-    float armMotion = 10.0f * std::sin(elapsedSeconds * 3.0f);
+    // --------------------------------------------------
+    // FARMER: STANDS AT THE FRONT OF THE COUNTER
+    // --------------------------------------------------
+
+    glPushMatrix();
+
+    // Move farmer closer to the counter
+    glTranslatef(0.8f, 0.1f, 3.0f);
+
+    // Turn farmer towards the shopkeeper
+    glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+
+    // Arm movement for the milk handover
+    float armMotion = 0.0f;
+
+    if (elapsedSeconds >= 5.0f && elapsedSeconds <= 12.0f)
+    {
+        armMotion = 35.0f * std::sin(
+            (elapsedSeconds - 5.0f) * 3.14159f / 7.0f
+        );
+    }
 
     drawFarmer(
-        2.0f, 0.1f, 5.5f,
-        0.8f, 0.0f, 0.0f, armMotion
+        0.0f, 0.0f, 0.0f,
+        0.8f,
+        0.0f,
+        0.0f,
+        armMotion
     );
+
+    glPopMatrix();
 }

@@ -1,7 +1,9 @@
 
 #include <GL/freeglut.h>
 #include <cmath>
+#include <algorithm>
 
+#include "../characters/farmer.h"
 #include "packaging.h"
 #include "environment_utils.h"
 
@@ -49,7 +51,7 @@ namespace
                      0.20f * scale, 0.65f * scale,
                      r, g, b);
 
-        // Bottle shoulder
+        // Rounded shoulder
         drawEllipsoid(x, y + 0.65f * scale, z,
                       0.20f * scale, 0.13f * scale,
                       0.20f * scale,
@@ -66,7 +68,7 @@ namespace
                 0.22f * scale,
                 0.82f, 0.82f, 0.76f);
 
-        // Bottle label
+        // Label
         packBox(x, y + 0.34f * scale, z + 0.19f * scale,
                 0.23f * scale, 0.22f * scale,
                 0.015f * scale,
@@ -159,7 +161,7 @@ namespace
                 0.12f, 1.4f, 0.12f,
                 0.34f, 0.36f, 0.37f);
 
-        // Small processing containers
+        // Processing containers
         packCylinder(-4.8f, -0.22f, 1.0f,
                      0.38f, 0.55f,
                      0.72f, 0.75f, 0.76f);
@@ -175,7 +177,7 @@ namespace
 
     void drawMilkStorageTanks()
     {
-        // Two large storage tanks
+        // Storage tanks
         packCylinder(3.7f, -1.8f, -3.0f,
                      1.05f, 2.8f,
                      0.66f, 0.70f, 0.72f);
@@ -184,7 +186,7 @@ namespace
                      1.05f, 2.8f,
                      0.66f, 0.70f, 0.72f);
 
-        // Rounded tank tops
+        // Rounded tops
         drawEllipsoid(3.7f, 1.0f, -3.0f,
                       1.05f, 0.22f, 1.05f,
                       0.72f, 0.75f, 0.76f);
@@ -193,7 +195,7 @@ namespace
                       1.05f, 0.22f, 1.05f,
                       0.72f, 0.75f, 0.76f);
 
-        // Tank access lids
+        // Access lids
         packCylinder(3.7f, 1.15f, -3.0f,
                      0.28f, 0.20f,
                      0.45f, 0.49f, 0.51f);
@@ -202,7 +204,7 @@ namespace
                      0.28f, 0.20f,
                      0.45f, 0.49f, 0.51f);
 
-        // Tank connecting pipe
+        // Connecting pipe
         drawCylinder(3.7f, 0.4f, -1.9f,
                      6.0f, 0.4f, -1.9f,
                      0.09f, 0.63f, 0.66f, 0.68f);
@@ -271,7 +273,7 @@ namespace
                 0.15f, 2.5f, 0.15f,
                 0.31f, 0.19f, 0.11f);
 
-        // Bottles on lower shelf
+        // Lower shelf bottles
         packBottle(-6.7f, -0.65f, -4.8f, 0.75f,
                    0.76f, 0.83f, 0.85f);
 
@@ -281,7 +283,7 @@ namespace
         packBottle(-4.7f, -0.65f, -4.8f, 0.75f,
                    0.76f, 0.83f, 0.85f);
 
-        // Bottles on upper shelf
+        // Upper shelf bottles
         packBottle(-6.7f, 0.55f, -4.8f, 0.75f,
                    0.76f, 0.83f, 0.85f);
 
@@ -329,7 +331,6 @@ namespace
                 4.5f, 0.8f, 0.12f,
                 0.30f, 0.22f, 0.14f);
 
-        // Simple pale sign lettering represented by raised panels.
         packBox(-1.0f, 3.0f, 6.66f,
                 0.12f, 0.32f, 0.04f,
                 0.91f, 0.86f, 0.70f);
@@ -342,9 +343,169 @@ namespace
                 0.12f, 0.32f, 0.04f,
                 0.91f, 0.86f, 0.70f);
     }
+
+    // Draw the bottle at the station before collection,
+    // then on the processing table after delivery.
+    
+void drawPackagingBottleProcess(float elapsedSeconds)
+{
+    // Bottle waits at the filling station.
+    if (elapsedSeconds < 6.0f)
+    {
+        packBottle(
+            1.0f, -0.67f, 3.7f,
+            0.75f,
+            0.76f, 0.83f, 0.85f
+        );
+    }
+    // Bottle rests on the processing table from 11 to 14 seconds.
+    else if (elapsedSeconds >= 11.0f && elapsedSeconds < 14.0f)
+    {
+        packBottle(
+            -2.5f, -0.22f, 1.0f,
+            0.75f,
+            0.76f, 0.83f, 0.85f
+        );
+    }
 }
 
-void drawPackagingRoom()
+// Farmer animation
+}
+void drawPackagingFarmer(float elapsedSeconds)
+{
+    float farmerX = 0.0f;
+    float farmerZ = 0.0f;
+    float rotation = 0.0f;
+
+    float legL = 0.0f;
+    float legR = 0.0f;
+    float armL = 10.0f;
+    float armR = 10.0f;
+    float hip = 5.0f;
+
+    float walkProgress = 0.0f;
+    bool carryingBottle = false;
+
+    // STAGE 1: Walk to the filling station.
+    if (elapsedSeconds < 4.0f)
+    {
+        walkProgress = elapsedSeconds / 4.0f;
+
+        farmerX = -2.5f + 3.3f * walkProgress;
+        farmerZ = 3.3f;
+        rotation = 90.0f;
+
+        float step = sinf(elapsedSeconds * 7.0f);
+        legL = 22.0f * step;
+        legR = -22.0f * step;
+        armL = -20.0f * step;
+        armR = 20.0f * step;
+    }
+
+    // STAGE 2: Pick up the bottle.
+    else if (elapsedSeconds < 6.0f)
+    {
+        farmerX = 0.8f;
+        farmerZ = 3.3f;
+        rotation = 90.0f;
+
+        hip = 30.0f;
+        armL = 65.0f;
+        armR = 65.0f;
+    }
+
+    // STAGE 3: Carry bottle to the processing table.
+    else if (elapsedSeconds < 11.0f)
+    {
+        walkProgress = (elapsedSeconds - 6.0f) / 5.0f;
+
+        farmerX = 0.8f - 3.0f * walkProgress;
+        farmerZ = 3.3f - 0.8f * walkProgress;
+        rotation = -105.0f;
+
+        float step = sinf(elapsedSeconds * 7.0f);
+        legL = 20.0f * step;
+        legR = -20.0f * step;
+
+        armL = 55.0f;
+        armR = 10.0f;
+    }
+
+    // STAGE 4: Place the bottle on the table.
+    else if (elapsedSeconds < 14.0f)
+    {
+        farmerX = -2.2f;
+        farmerZ = 2.5f;
+        rotation = -105.0f;
+
+        hip = 20.0f;
+        armL = 55.0f;
+        armR = 15.0f;
+    }
+
+    // STAGE 5: Pick the bottle up again.
+    else if (elapsedSeconds < 16.0f)
+    {
+        farmerX = -2.2f;
+        farmerZ = 2.5f;
+        rotation = -105.0f;
+
+        hip = 18.0f;
+        armL = 60.0f;
+        armR = 15.0f;
+        carryingBottle = true;
+    }
+
+    // STAGE 6: Turn and walk out through the entrance.
+    else
+    {
+        walkProgress = std::min((elapsedSeconds - 16.0f) / 7.0f, 1.0f);
+
+        farmerX = -2.2f + 4.0f * walkProgress;
+        farmerZ = 2.5f + 6.0f * walkProgress;
+
+        rotation = 180.0f;
+
+        float step = sinf(elapsedSeconds * 7.0f);
+        legL = 22.0f * step;
+        legR = -22.0f * step;
+
+        armL = 45.0f;
+        armR = 10.0f;
+
+        carryingBottle = true;
+    }
+
+    glPushMatrix();
+
+    glTranslatef(farmerX, -1.0f, farmerZ);
+    glRotatef(rotation, 0.0f, 1.0f, 0.0f);
+
+    drawFarmerPosed(
+        0.0f, 0.0f, 0.0f,
+        1.0f,
+        hip,
+        legL,
+        legR,
+        armL,
+        armR,
+        elapsedSeconds
+    );
+
+    if (carryingBottle)
+    {
+        packBottle(
+            -0.42f, 0.45f, 0.12f,
+            0.65f,
+            0.76f, 0.83f, 0.85f
+        );
+    }
+
+    glPopMatrix();
+}
+
+// Complete packaging room
+void drawPackagingRoom(float elapsedSeconds)
 {
     drawPackagingBuilding();
     drawProcessingTable();
@@ -353,4 +514,7 @@ void drawPackagingRoom()
     drawBottleShelves();
     drawWashingSink();
     drawRoomSign();
+
+    drawPackagingBottleProcess(elapsedSeconds);
+    drawPackagingFarmer(elapsedSeconds);
 }
